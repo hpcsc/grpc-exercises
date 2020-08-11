@@ -1,0 +1,25 @@
+project_name: grpc-sum-api
+
+containers:
+  build-env:
+    build_directory: .batect/build-env
+    volumes:
+      - local: .
+        container: /app
+        options: cached
+      - type: cache
+        container: /go
+        name: go-cache
+    working_directory: /app
+    environment:
+      GOCACHE: /go/build-cache
+    run_as_current_user:
+      enabled: true
+      home_directory: /home/container-user
+
+tasks:
+  generate:
+    description: Compile protobuf file
+    run:
+      container: build-env
+      command: /app/scripts/generate.sh

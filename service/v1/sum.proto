@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package service.v1;
+
+option go_package = ".;service_v1";
+
+message SumRequest {
+  int32 first = 1;
+  int32 second = 2;
+}
+
+message SumResponse {
+  int32 sum = 1;
+}
