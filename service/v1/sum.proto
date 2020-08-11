@@ -12,3 +12,7 @@ message SumRequest {
 message SumResponse {
   int32 sum = 1;
 }
+
+service SumService {
+  rpc Sum(SumRequest) returns (SumResponse);
+}
