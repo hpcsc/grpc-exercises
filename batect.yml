@@ -11,8 +11,11 @@ containers:
         container: /go
         name: go-cache
     working_directory: /app
+    ports:
+      - 50051:50051
     environment:
       GOCACHE: /go/build-cache
+      SERVER_PORT: 50051
     run_as_current_user:
       enabled: true
       home_directory: /home/container-user
@@ -23,3 +26,12 @@ tasks:
     run:
       container: build-env
       command: /app/scripts/generate.sh
+
+  startServer:
+    description: Start GRPC server
+    run:
+      container: build-env
+      entrypoint: /app/scripts/run.sh
+      command: server
+    prerequisites:
+      - generate

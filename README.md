@@ -7,3 +7,11 @@ A test GRPC application
 ```
 ./batect generate
 ```
+
+## Run GRPC server
+
+```
+./batect startServer
+```
+
+This task will invoke `generate` task before running the server
