@@ -1,5 +1,9 @@
 project_name: grpc-sum-api
 
+config_variables:
+  server_port:
+    default: 50051
+
 containers:
   build-env:
     build_directory: .batect/build-env
@@ -11,11 +15,9 @@ containers:
         container: /go
         name: go-cache
     working_directory: /app
-    ports:
-      - 50051:50051
     environment:
       GOCACHE: /go/build-cache
-      SERVER_PORT: 50051
+      SERVER_PORT: <{server_port}
     run_as_current_user:
       enabled: true
       home_directory: /home/container-user
