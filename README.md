@@ -15,3 +15,11 @@ A test GRPC application
 ```
 
 This task will invoke `generate` task before running the server
+
+## Run GRPC client
+
+```
+./batect startClient
+```
+
+This task will invoke `generate` task and run server before starting client
