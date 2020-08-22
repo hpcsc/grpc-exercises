@@ -16,6 +16,7 @@ type server struct {
 	service_v1.UnimplementedSumServiceServer
 	service_v1.UnimplementedPrimeNumberDecompositionServiceServer
 	service_v1.UnimplementedComputeAverageServiceServer
+	service_v1.UnimplementedFindMaximumServiceServer
 }
 
 func (s *server)Sum(ctx context.Context, req *service_v1.SumRequest) (*service_v1.SumResponse, error) {
@@ -74,6 +75,33 @@ func (s *server)ComputeAverage(stream service_v1.ComputeAverageService_ComputeAv
 	return nil
 }
 
+func (s *server)FindMaximum(stream service_v1.FindMaximumService_FindMaximumServer) error {
+	var maximum int32
+
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			fmt.Println("Stream closed by client")
+			return nil
+		}
+
+		if err != nil {
+			fmt.Printf("FindMaximum: encountered error: %v", err)
+			return err
+		}
+
+		fmt.Printf("Received %d from client\n", req.GetInput())
+
+		if req.GetInput() > maximum {
+			maximum = req.GetInput()
+			stream.Send(&service_v1.FindMaximumResponse{Maximum: maximum})
+			fmt.Printf("Sent current maximum of %d to client\n", maximum)
+		}
+	}
+
+	return nil
+}
+
 func main() {
 	port, err := strconv.Atoi(os.Getenv("SERVER_PORT"))
 	if err != nil {
@@ -92,6 +120,7 @@ func main() {
 	service_v1.RegisterSumServiceServer(grpcServer, &server{})
 	service_v1.RegisterComputeAverageServiceServer(grpcServer, &server{})
 	service_v1.RegisterPrimeNumberDecompositionServiceServer(grpcServer, &server{})
+	service_v1.RegisterFindMaximumServiceServer(grpcServer, &server{})
 
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
