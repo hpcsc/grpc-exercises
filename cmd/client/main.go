@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"sync"
 )
 
 const (
@@ -88,7 +89,9 @@ func startFindMaximumClient(connection *grpc.ClientConn) {
 		log.Fatalf("Error while calling server: %v", err)
 	}
 
-	c := make(chan struct{})
+	var wg sync.WaitGroup
+
+	wg.Add(1)
 
 	go func() {
 		for {
@@ -105,7 +108,7 @@ func startFindMaximumClient(connection *grpc.ClientConn) {
 			fmt.Printf("Current maximum: %v\n", res.GetMaximum())
 		}
 
-		c <- struct{}{}
+		wg.Done()
 	}()
 
 	for {
@@ -127,7 +130,7 @@ func startFindMaximumClient(connection *grpc.ClientConn) {
 		fmt.Printf("=== Sent %v to server\n", input)
 	}
 
-	<- c
+	wg.Wait()
 }
 
 func startPrimeDecompositionClient(connection *grpc.ClientConn) {
