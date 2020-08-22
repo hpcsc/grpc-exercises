@@ -1,6 +1,6 @@
-# GRPC Sum API
+# GRPC Exercises
 
-A test GRPC application
+My attempt for the exercises from [Udemy gRPC Golang course](https://www.udemy.com/course/grpc-golang/learn/lecture/11018796#overview)
 
 ## Generate GRPC code
 

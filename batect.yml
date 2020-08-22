@@ -1,4 +1,4 @@
-project_name: grpc-sum-api
+project_name: grpc-exercises
 
 config_variables:
   server_port:

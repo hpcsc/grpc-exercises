@@ -1,4 +1,4 @@
-module grpc-sum-api
+module grpc-exercises
 
 go 1.13
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
-	service_v1 "grpc-sum-api/service/v1"
+	service_v1 "grpc-exercises/service/v1"
 	"log"
 	"net"
 	"os"
