@@ -10,6 +10,9 @@ My attempt for the exercises from [Udemy gRPC Golang course](https://www.udemy.c
   - Sum: Unary GRPC Service
   - Prime Number Decomposition: Server Streaming
   - Compute Average: Client Streaming
+  - Find Maximum: Bi-Directional Streaming
+
+![alt Client UI](https://github.com/hpcsc/grpc-exercises/raw/master/client-ui.png)
 
 ## Generate GRPC code
 
