@@ -35,8 +35,7 @@ func main() {
 	_, selectedService, err := prompt.Run()
 
 	if err != nil {
-		fmt.Printf("Failed to get user input for service to connect to: %v\n", err)
-		return
+		log.Fatalf("Failed to get user input for service to connect to: %v\n", err)
 	}
 
 	fmt.Printf("Connecting client to server at: %s\n", serverUrl)
@@ -89,9 +88,19 @@ func startComputeAverageClient(connection *grpc.ClientConn) {
 func startSumClient(connection *grpc.ClientConn) {
 	client := service_v1.NewSumServiceClient(connection)
 
+	first, err := getIntInput("Enter first number")
+	if err == io.EOF {
+		log.Fatalf("No user input, exiting")
+	}
+
+	second, err := getIntInput("Enter second number")
+	if err == io.EOF {
+		log.Fatalf("No user input, exiting")
+	}
+
 	request := &service_v1.SumRequest{
-		First:  1,
-		Second: 2,
+		First:  first,
+		Second: second,
 	}
 
 	response, err := client.Sum(context.Background(), request)
@@ -99,7 +108,7 @@ func startSumClient(connection *grpc.ClientConn) {
 		log.Fatalf("Error while calling server: %v", err)
 	}
 
-	log.Printf("1 + 2 = %d", response.Sum)
+	fmt.Printf("Result: %d + %d = %d", first, second, response.Sum)
 }
 
 func getIntInput(label string) (int32, error) {
