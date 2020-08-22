@@ -33,6 +33,8 @@ containers:
         container: /go
         name: go-cache
     working_directory: /app
+    health_check:
+      command: sh -c 'nc -z localhost ${SERVER_PORT}'
     environment:
       SERVER_PORT: <{server_port}
     run_as_current_user:

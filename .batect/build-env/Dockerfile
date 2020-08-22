@@ -1,7 +1,7 @@
 FROM golang:1.14.7-stretch
 
 RUN apt-get -y update && \
-  apt-get install -y --no-install-recommends protobuf-compiler=3.0.0-9 && \
+  apt-get install -y --no-install-recommends protobuf-compiler=3.0.0-9 netcat && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 
