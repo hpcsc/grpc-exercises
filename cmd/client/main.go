@@ -14,9 +14,10 @@ import (
 )
 
 const (
-	sumServiceLabel            = "Sum"
-	computeAverageServiceLabel = "Compute Average"
-	quitLabel                  = "Quit"
+	sumServiceLabel                = "Sum"
+	primeDecompositionServiceLabel = "Prime Number Decomposition"
+	computeAverageServiceLabel     = "Compute Average"
+	quitLabel                      = "Quit"
 )
 
 func main() {
@@ -30,6 +31,7 @@ func main() {
 			Label: "Select service to connect to",
 			Items: []string{
 				sumServiceLabel,
+				primeDecompositionServiceLabel,
 				computeAverageServiceLabel,
 				quitLabel,
 			},
@@ -64,11 +66,45 @@ func startClient(serverUrl string, selectedService string) {
 	case sumServiceLabel:
 		startSumClient(clientConnection)
 		break
+	case primeDecompositionServiceLabel:
+		startPrimeDecompositionClient(clientConnection)
+		break
 	case computeAverageServiceLabel:
 		startComputeAverageClient(clientConnection)
 		break
 	}
 	fmt.Println("==================================")
+}
+
+func startPrimeDecompositionClient(connection *grpc.ClientConn) {
+	client := service_v1.NewPrimeNumberDecompositionServiceClient(connection)
+
+	input, err := getIntInput("Enter a number to decompose")
+	if err == io.EOF {
+		log.Fatalf("No user input, exiting")
+	}
+
+	stream, err := client.Decompose(context.Background(), &service_v1.PrimeNumberDecompositionRequest{
+		Input: input,
+	})
+
+	if err != nil {
+		log.Fatalf("Error while calling server: %v", err)
+	}
+
+	for {
+		res, err := stream.Recv()
+		if err == io.EOF {
+			fmt.Println("Server finished sending")
+			break
+		}
+
+		if err != nil {
+			log.Fatalf("Error while receiving result from server: %v", err)
+		}
+
+		fmt.Printf("Result: %v\n", res.GetResult())
+	}
 }
 
 func startComputeAverageClient(connection *grpc.ClientConn) {
