@@ -17,6 +17,7 @@ const (
 	sumServiceLabel                = "Sum"
 	primeDecompositionServiceLabel = "Prime Number Decomposition"
 	computeAverageServiceLabel     = "Compute Average"
+	findMaximumServiceLabel        = "Find Maximum"
 	quitLabel                      = "Quit"
 )
 
@@ -33,6 +34,7 @@ func main() {
 				sumServiceLabel,
 				primeDecompositionServiceLabel,
 				computeAverageServiceLabel,
+				findMaximumServiceLabel,
 				quitLabel,
 			},
 		}
@@ -72,8 +74,60 @@ func startClient(serverUrl string, selectedService string) {
 	case computeAverageServiceLabel:
 		startComputeAverageClient(clientConnection)
 		break
+	case findMaximumServiceLabel:
+		startFindMaximumClient(clientConnection)
+		break
 	}
 	fmt.Println("==================================")
+}
+
+func startFindMaximumClient(connection *grpc.ClientConn) {
+	client := service_v1.NewFindMaximumServiceClient(connection)
+	stream, err := client.FindMaximum(context.Background())
+	if err != nil {
+		log.Fatalf("Error while calling server: %v", err)
+	}
+
+	c := make(chan struct{})
+
+	go func() {
+		for {
+			res, err := stream.Recv()
+			if err == io.EOF {
+				fmt.Println("Stream closed by server")
+				break
+			}
+
+			if err != nil {
+				log.Fatalf("Failed to receive response from server: %v", err)
+			}
+
+			fmt.Printf("Current maximum: %v\n", res.GetMaximum())
+		}
+
+		c <- struct{}{}
+	}()
+
+	for {
+		input, err := getIntInput("Enter an integer")
+		if err == io.EOF {
+			err := stream.CloseSend()
+			if err != nil {
+				log.Fatalf("Failed to close sending to server: %v", err)
+			}
+
+			break
+		}
+
+		if err != nil {
+			log.Fatalf("Failed to get user input: %v", err)
+		}
+
+		stream.Send(&service_v1.FindMaximumRequest{Input: input})
+		fmt.Printf("=== Sent %v to server\n", input)
+	}
+
+	<- c
 }
 
 func startPrimeDecompositionClient(connection *grpc.ClientConn) {
