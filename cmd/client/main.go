@@ -16,6 +16,7 @@ import (
 const (
 	sumServiceLabel            = "Sum"
 	computeAverageServiceLabel = "Compute Average"
+	quitLabel                  = "Quit"
 )
 
 func main() {
@@ -24,21 +25,32 @@ func main() {
 		log.Fatalf("SERVER_URL is required")
 	}
 
-	prompt := promptui.Select{
-		Label: "Select service to connect to",
-		Items: []string{
-			sumServiceLabel,
-			computeAverageServiceLabel,
-		},
+	for {
+		prompt := promptui.Select{
+			Label: "Select service to connect to",
+			Items: []string{
+				sumServiceLabel,
+				computeAverageServiceLabel,
+				quitLabel,
+			},
+		}
+
+		_, selectedService, err := prompt.Run()
+
+		if err != nil {
+			log.Fatalf("Failed to get user input for service to connect to: %v\n", err)
+		}
+
+		if selectedService == quitLabel {
+			break
+		} else {
+			startClient(serverUrl, selectedService)
+		}
 	}
+}
 
-	_, selectedService, err := prompt.Run()
-
-	if err != nil {
-		log.Fatalf("Failed to get user input for service to connect to: %v\n", err)
-	}
-
-	fmt.Printf("Connecting client to server at: %s\n", serverUrl)
+func startClient(serverUrl string, selectedService string) {
+	fmt.Println("==================================")
 	clientConnection, err := grpc.Dial(serverUrl, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("Could not connect to %s with error: %v", serverUrl, err)
@@ -46,10 +58,8 @@ func main() {
 
 	defer clientConnection.Close()
 
-	startClient(selectedService, clientConnection)
-}
+	fmt.Printf("[%s] Connected to server at: %s\n", selectedService, serverUrl)
 
-func startClient(selectedService string, clientConnection *grpc.ClientConn) {
 	switch selectedService {
 	case sumServiceLabel:
 		startSumClient(clientConnection)
@@ -58,6 +68,7 @@ func startClient(selectedService string, clientConnection *grpc.ClientConn) {
 		startComputeAverageClient(clientConnection)
 		break
 	}
+	fmt.Println("==================================")
 }
 
 func startComputeAverageClient(connection *grpc.ClientConn) {
@@ -108,7 +119,7 @@ func startSumClient(connection *grpc.ClientConn) {
 		log.Fatalf("Error while calling server: %v", err)
 	}
 
-	fmt.Printf("Result: %d + %d = %d", first, second, response.Sum)
+	fmt.Printf("Result: %d + %d = %d\n", first, second, response.Sum)
 }
 
 func getIntInput(label string) (int32, error) {
